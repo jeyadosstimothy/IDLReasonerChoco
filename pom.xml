@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>es.us.isa</groupId>
-    <artifactId>IDLReasoner-choco</artifactId>
+    <artifactId>idlreasoner-choco</artifactId>
     <version>1.0.0</version>
 
-    <name>IDLReasoner-choco</name>
-    <description>A choco-based Java library for analyzing IDL specifications</description>
+    <name>IDLReasonerChoco</name>
+    <description>A Choco-based Java library for analyzing IDL specifications</description>
 
     <developers>
         <developer>
@@ -26,6 +26,13 @@
             <id>danimilles</id>
             <name>Daniel Sánchez Baleyrón</name>
             <email>dansanbal@alum.us.es</email>
+            <organization>University of Seville</organization>
+            <organizationUrl>http://www.us.es</organizationUrl>
+        </developer>
+        <developer>
+            <id>AML14</id>
+            <name>Alberto Martín López</name>
+            <email>alberto.martin@us.es</email>
             <organization>University of Seville</organization>
             <organizationUrl>http://www.us.es</organizationUrl>
         </developer>
@@ -116,7 +123,7 @@
                                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 </manifest>
                             </archive>
-                            <finalName>IDLReasoner-choco-full</finalName>
+                            <finalName>IDLReasonerChoco-full</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
