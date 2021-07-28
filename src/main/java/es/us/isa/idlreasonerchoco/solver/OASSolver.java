@@ -10,7 +10,8 @@ import java.util.Map;
 import es.us.isa.idlreasonerchoco.model.ParameterType;
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
 import es.us.isa.idlreasonerchoco.utils.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.search.strategy.Search;
@@ -32,7 +33,7 @@ import es.us.isa.idlreasonerchoco.configuration.IDLException;
 import io.swagger.v3.oas.models.parameters.Parameter;
 
 public class OASSolver extends Solver {
-	private static final Logger LOG = Logger.getLogger(OASSolver.class);
+	private static final Logger LOG = LogManager.getLogger(OASSolver.class);
 
     private static final String DUMMY_URI = "dummy:/dummy.idl";
     private static final int MIN_INTEGER = -1000;

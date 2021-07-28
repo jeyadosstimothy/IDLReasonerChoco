@@ -9,7 +9,8 @@ import es.us.isa.idlreasonerchoco.mapper.OASMapper;
 import es.us.isa.idlreasonerchoco.model.ParameterType;
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
 import es.us.isa.idlreasonerchoco.utils.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
 
@@ -17,7 +18,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 
 public class OASRandomRequest implements RequestGenerationOperation {
 
-    private static final Logger LOG = Logger.getLogger(OASRandomRequest.class);
+    private static final Logger LOG = LogManager.getLogger(OASRandomRequest.class);
 
     private final OASMapper mapper;
     private final boolean valid;

@@ -3,7 +3,8 @@ package es.us.isa.idlreasonerchoco.analyzer.operations.oas;
 import es.us.isa.idlreasonerchoco.mapper.OASMapper;
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
 import es.us.isa.idlreasonerchoco.utils.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.variables.BoolVar;
 
@@ -12,7 +13,7 @@ import es.us.isa.idlreasonerchoco.configuration.IDLException;
 
 public class OASDeadParameter implements AnalysisOperation {
 
-    private static final Logger LOG = Logger.getLogger(OASDeadParameter.class);
+    private static final Logger LOG = LogManager.getLogger(OASDeadParameter.class);
 
     private final OASMapper mapper;
     private final String paramName;

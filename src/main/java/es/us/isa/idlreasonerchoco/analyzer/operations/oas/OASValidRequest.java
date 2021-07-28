@@ -10,7 +10,8 @@ import es.us.isa.idlreasonerchoco.mapper.OASMapper;
 import es.us.isa.idlreasonerchoco.model.ParameterType;
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
 import es.us.isa.idlreasonerchoco.utils.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.variables.BoolVar;
 import org.chocosolver.solver.variables.IntVar;
@@ -19,7 +20,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 
 public class OASValidRequest implements AnalysisOperation {
 
-    private static final Logger LOG = Logger.getLogger(OASValidRequest.class);
+    private static final Logger LOG = LogManager.getLogger(OASValidRequest.class);
 
     private final OASMapper mapper;
     private final Map<String, String> request;

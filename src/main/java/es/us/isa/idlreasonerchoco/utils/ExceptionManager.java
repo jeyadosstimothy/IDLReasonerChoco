@@ -1,6 +1,6 @@
 package es.us.isa.idlreasonerchoco.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 

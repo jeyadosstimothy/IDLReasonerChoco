@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.variables.Variable;
 
@@ -31,7 +32,7 @@ import io.swagger.v3.parser.core.models.ParseOptions;
 public class OASMapper extends Mapper {
     private static final String BODY_EXTENSION = "_body";
 
-	private static final Logger LOG = Logger.getLogger(OASMapper.class);
+	private static final Logger LOG = LogManager.getLogger(OASMapper.class);
 
     private static final String FORM_DATA = "formData";
     private static final String OAS_SPECIFICATION_TYPE = "oas";
