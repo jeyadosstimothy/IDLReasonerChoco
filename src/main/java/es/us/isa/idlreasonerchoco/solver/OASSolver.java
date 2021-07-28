@@ -120,7 +120,7 @@ public class OASSolver extends Solver {
                         int[] domain = paramData.stream().mapToInt(x -> this.stringToInt(x.toString())).toArray();
                         this.getVariable(Utils.parseIDLParamName(parameter.getName()), IntVar.class, true, domain);
                     } else if (paramIsNumber) {
-                        int[] domain = paramData.stream().mapToInt(Integer::parseInt).toArray();
+                        int[] domain = paramData.stream().mapToInt(x -> (int)Double.parseDouble(x)).toArray();
                         this.getVariable(Utils.parseIDLParamName(parameter.getName()), IntVar.class, true, domain);
 
                     } else {
