@@ -122,7 +122,7 @@ public class OASMapper extends Mapper {
         }
 
         for (Map.Entry<String, Schema> property : formDataBodyProperties.entrySet()) {
-            Parameter parameter = new Parameter().name(property.getKey()).in(FORM_DATA).required(formDataBody.getRequired().contains(property.getKey()));
+            Parameter parameter = new Parameter().name(property.getKey()).in(FORM_DATA).required(formDataBody.getRequired() != null && formDataBody.getRequired().contains(property.getKey()));
             parameter.setSchema(new Schema().type(property.getValue().getType()));
             parameter.getSchema().setEnum(property.getValue().getEnum());
             formDataParameters.add(parameter);
