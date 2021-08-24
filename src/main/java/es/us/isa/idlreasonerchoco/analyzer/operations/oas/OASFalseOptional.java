@@ -25,7 +25,7 @@ public class OASFalseOptional implements AnalysisOperation {
 
     public boolean analyze() throws IDLException {
         restartSolverIfNeeded(mapper);
-    	if(mapper.getParameters().stream().anyMatch(x -> x.getName().equals(paramName) && x.getRequired())) {
+    	if(mapper.getParameters().stream().anyMatch(x -> x.getName().equals(paramName) && Boolean.TRUE.equals(x.getRequired()))) {
     		return false;
     	}
         if (mapper.getVariablesMap().get(Utils.parseIDLParamName(paramName) + "Set") != null) {

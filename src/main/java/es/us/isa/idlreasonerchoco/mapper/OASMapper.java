@@ -21,7 +21,7 @@ import es.us.isa.idlreasonerchoco.configuration.IDLConfiguration;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 import es.us.isa.idlreasonerchoco.model.OperationType;
 import es.us.isa.idlreasonerchoco.solver.OASSolver;
-import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -66,12 +66,13 @@ public class OASMapper extends Mapper {
 
     private void readOpenApiSpecification() throws IDLException {
         ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
         parseOptions.setResolveFully(true);
-        parseOptions.setFlatten(true);
+        parseOptions.setResolveCombinators(true);
         if (this.configuration.isSpecAsString()) {
-            this.openApiSpecification = new OpenAPIParser().readContents(this.configuration.getApiSpecification(), null, parseOptions).getOpenAPI();
+            this.openApiSpecification = new OpenAPIV3Parser().readContents(this.configuration.getApiSpecification(), null, parseOptions).getOpenAPI();
         } else {
-            this.openApiSpecification = new OpenAPIParser().readLocation(this.configuration.getApiSpecification(), null, parseOptions).getOpenAPI();
+            this.openApiSpecification = new OpenAPIV3Parser().read(this.configuration.getApiSpecification(), null, parseOptions);
         }
         this.operation = getOasOperation(this.configuration.getOperationPath(), this.configuration.getOperationType());
         this.parameters = this.operation.getParameters() != null? this.operation.getParameters() : new ArrayList<>();
