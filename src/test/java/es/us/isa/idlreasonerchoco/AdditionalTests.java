@@ -1,5 +1,6 @@
 package es.us.isa.idlreasonerchoco;
 
+import java.time.Duration;
 import java.util.*;
 
 import org.junit.jupiter.api.Test;
@@ -587,6 +588,86 @@ public class AdditionalTests {
         assertNull(validRequest.get("p2"), "Parameter p2 must be null");
         assertEquals("true", validRequest.get("p1"), "Parameter p1 can only be 'true'");
         assertEquals("1", validRequest.get("p3"), "Parameter p3 can only be '1'");
+    }
+
+    @Test
+    public void problematicYelpDependencies() throws IDLException {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () ->{
+            Analyzer analyzer = new OASAnalyzer("./src/test/resources/yelp.yaml", "/businesses/search", "get");
+
+            Map<String, List<String>> inputData = new HashMap<>();
+            inputData.put("offset", Arrays.asList("930", "391", "87", "598", "199", "798", "945", "515", "601", "916"));
+            inputData.put("latitude", Arrays.asList("41.4248", "47.090492", "36.76126", "41.559193", "34.588825", "40.88466", "35.54669", "42.216522", "40.81036", "43.965572"));
+            inputData.put("sort_by", Arrays.asList("best_match", "rating", "review_count", "distance"));
+            inputData.put("locale", Arrays.asList("cs_CZ", "da_DK", "de_AT", "de_CH", "de_DE", "en_AU", "en_BE", "en_CA", "en_CH", "en_GB", "en_HK", "en_IE", "en_MY", "en_NZ", "en_PH", "en_SG", "en_US", "es_AR", "es_CL", "es_ES", "es_MX", "fi_FI", "fil_PH", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "it_CH", "it_IT", "ja_JP", "ms_MY", "nb_NO", "nl_BE", "nl_NL", "pl_PL", "pt_BR", "pt_PT", "sv_FI", "sv_SE", "tr_TR", "zh_HK", "zh_TW"));
+            inputData.put("open_now", Arrays.asList("false", "true"));
+            inputData.put("price", Arrays.asList("3,4", "4,1,2", "1,2,3,4", "4", "3", "2,3", "1,3,2,4"));
+            inputData.put("limit", Arrays.asList("9", "4", "19", "14", "43", "11", "26", "46", "21", "39"));
+            inputData.put("term", Arrays.asList("food", "cinema", "open", "cheap", "public", "exciting", "cafe", "ok", "the", "watch"));
+            inputData.put("location", Arrays.asList("NYC", "Seville, Spain", "Milan, Italy", "Melbourne", "Tokyo", "Egypt", "Juarez, Mexico", "Paris", "San Francisco", "Krakow", "Daca, Bangladesh", "Santa Fe"));
+            inputData.put("attributes", Arrays.asList("waitlist_reservation,deals", "deals", "request_a_quote", "gender_neutral_restrooms,hot_and_new,open_to_all", "wheelchair_accessible", "request_a_quote,open_to_all", "request_a_quote,waitlist_reservation"));
+            inputData.put("categories", Arrays.asList("driveintheater,qigong", "trafficticketinglaw,occupationaltherapy,ateliers,driving_schools,drugstores", "suppliesrestaurant,homeappliancerepair,surfshop", "driveintheater", "commissionedartists", "taekwondo", "afrobrazilian", "apartmentagents", "african,lasertag", "kids_activities,truckrepair"));
+            inputData.put("radius", Arrays.asList("29782", "15173", "17616", "10720", "23468", "6164", "35502", "25428", "14380", "28849"));
+            inputData.put("open_at", Arrays.asList("2103623019", "1647379796", "1758687139", "1968886206", "1730905071", "1966451543", "2027034146", "1677754192", "2081502156", "1767117931"));
+            inputData.put("longitude", Arrays.asList("-90.311646", "-114.955315", "-106.71193", "-91.312546", "-96.45189", "-95.25761", "-111.34424", "-99.32146", "-114.827", "-117.82459"));
+
+            analyzer.updateData(inputData);
+
+            for (int i = 0; i < 100; i++) {
+                // Dead parameter
+                assertFalse(analyzer.isDeadParameter("offset"));
+                assertFalse(analyzer.isDeadParameter("latitude"));
+                assertFalse(analyzer.isDeadParameter("sort_by"));
+                assertFalse(analyzer.isDeadParameter("locale"));
+                assertFalse(analyzer.isDeadParameter("open_now"));
+                assertFalse(analyzer.isDeadParameter("price"));
+                assertFalse(analyzer.isDeadParameter("limit"));
+                assertFalse(analyzer.isDeadParameter("term"));
+                assertFalse(analyzer.isDeadParameter("location"));
+                assertFalse(analyzer.isDeadParameter("attributes"));
+                assertFalse(analyzer.isDeadParameter("categories"));
+                assertFalse(analyzer.isDeadParameter("radius"));
+                assertFalse(analyzer.isDeadParameter("open_at"));
+                assertFalse(analyzer.isDeadParameter("longitude"));
+
+                // False optional parameter
+                assertFalse(analyzer.isFalseOptional("offset"));
+                assertFalse(analyzer.isFalseOptional("latitude"));
+                assertFalse(analyzer.isFalseOptional("sort_by"));
+                assertFalse(analyzer.isFalseOptional("locale"));
+                assertFalse(analyzer.isFalseOptional("open_now"));
+                assertFalse(analyzer.isFalseOptional("price"));
+                assertFalse(analyzer.isFalseOptional("limit"));
+                assertFalse(analyzer.isFalseOptional("term"));
+                assertFalse(analyzer.isFalseOptional("location"));
+                assertFalse(analyzer.isFalseOptional("attributes"));
+                assertFalse(analyzer.isFalseOptional("categories"));
+                assertFalse(analyzer.isFalseOptional("radius"));
+                assertFalse(analyzer.isFalseOptional("open_at"));
+                assertFalse(analyzer.isFalseOptional("longitude"));
+
+                // Consistent
+                assertTrue(analyzer.isConsistent());
+
+                // Valid IDL
+                assertTrue(analyzer.isValidIDL());
+
+                // Random valid request
+                Map<String, String> validRequest = analyzer.getRandomValidRequest();
+
+                // Random invalid request
+                Map<String, String> invalidRequest = analyzer.getRandomInvalidRequest();
+
+                // Valid partial request
+                assertTrue(analyzer.isValidPartialRequest(validRequest));
+
+                // Valid request
+                assertTrue(analyzer.isValidRequest(validRequest));
+                assertFalse(analyzer.isValidRequest(invalidRequest));
+
+//                System.out.println(i);
+            }
+        });
     }
 
 //    @Test
