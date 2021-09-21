@@ -670,6 +670,87 @@ public class AdditionalTests {
         });
     }
 
+    @Test
+    public void updateDataOutOfRangeEnumsForNumbers() throws IDLException {
+        Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/numberAndIntegerParams", "get");
+
+        List<String> p1Data = Arrays.asList("true", "false");
+        List<String> p2Data = Arrays.asList("1", "2", "3");
+        List<String> p3Data = Arrays.asList("6");
+        List<String> p4Data = Arrays.asList("1.3", "-5.34452");
+        List<String> p5Data = Arrays.asList("hi", "hey");
+        Map <String, List<String>> inputData = new HashMap<>();
+        inputData.put("p1", p1Data);
+        inputData.put("p2", p2Data);
+        inputData.put("p3", p3Data);
+        inputData.put("p4", p4Data);
+        inputData.put("p5", p5Data);
+
+        analyzer.updateData(inputData);
+
+        Map<String, String> validRequest = analyzer.getRandomValidRequest();
+
+        assertEquals("6", validRequest.get("p3"));
+
+        System.out.println("Test passed: updateDataOutOfRangeEnumsForNumbers");
+    }
+
+    @Test
+    public void updateDataInvalidValuesForNumbersAndBooleans() throws IDLException {
+        Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/numberAndIntegerParams", "get");
+
+        List<String> p1Data = Arrays.asList("true", "error");
+        List<String> p2Data = Arrays.asList("2.4");
+        List<String> p3Data = Arrays.asList("6");
+        List<String> p4Data = Arrays.asList("3.3", "not a double");
+        List<String> p5Data = Arrays.asList("hi", "hey");
+        Map <String, List<String>> inputData = new HashMap<>();
+        inputData.put("p1", p1Data);
+        inputData.put("p2", p2Data);
+        inputData.put("p3", p3Data);
+        inputData.put("p4", p4Data);
+        inputData.put("p5", p5Data);
+
+        analyzer.updateData(inputData);
+
+        Map<String, String> validRequest = analyzer.getRandomValidRequest();
+
+        assertEquals("true", validRequest.get("p1"));
+        assertEquals("2", validRequest.get("p2"));
+        assertEquals("6", validRequest.get("p3"));
+        assertEquals("3", validRequest.get("p4"));
+
+        System.out.println("Test passed: updateDataInvalidValuesForNumbersAndBooleans");
+    }
+
+    @Test
+    public void updateDataVeryHighNumber() throws IDLException {
+        Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/numberAndIntegerParams", "get");
+
+        List<String> p1Data = Arrays.asList("true", "error");
+        List<String> p2Data = Arrays.asList("2.4", "2147483647");
+        List<String> p3Data = Arrays.asList("6");
+        List<String> p4Data = Arrays.asList("3.3", "not a double", "3458372835748375632523853");
+        List<String> p5Data = Arrays.asList("hi", "hey");
+        Map <String, List<String>> inputData = new HashMap<>();
+        inputData.put("p1", p1Data);
+        inputData.put("p2", p2Data);
+        inputData.put("p3", p3Data);
+        inputData.put("p4", p4Data);
+        inputData.put("p5", p5Data);
+
+        analyzer.updateData(inputData);
+
+        Map<String, String> validRequest = analyzer.getRandomValidRequest();
+
+        assertEquals("true", validRequest.get("p1"));
+        assertEquals("2", validRequest.get("p2"));
+        assertEquals("6", validRequest.get("p3"));
+        assertEquals("3", validRequest.get("p4"));
+
+        System.out.println("Test passed: updateDataVeryHighNumber");
+    }
+
 //    @Test
 //    public void loopInvalid() throws IDLException {
 //        Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/combinatorial3", "get");

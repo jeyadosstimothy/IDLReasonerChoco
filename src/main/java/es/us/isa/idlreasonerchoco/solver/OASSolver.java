@@ -121,7 +121,7 @@ public class OASSolver extends Solver {
                         int[] domain = paramData.stream().mapToInt(x -> this.stringToInt(x.toString())).toArray();
                         this.getVariable(Utils.parseIDLParamName(parameter.getName()), IntVar.class, true, domain);
                     } else if (paramIsNumber) {
-                        int[] domain = paramData.stream().mapToInt(x -> (int)Double.parseDouble(x)).toArray();
+                        int[] domain = getNumberDomain(paramData);
                         this.getVariable(Utils.parseIDLParamName(parameter.getName()), IntVar.class, true, domain);
 
                     } else {
@@ -160,6 +160,18 @@ public class OASSolver extends Solver {
             default:
                 return new int[]{};
         }
+    }
+
+    private int[] getNumberDomain(List<String> numberData) {
+        return numberData.stream()
+                .filter(x -> { // We need to filter out values that are not doubles or are too high
+                    try {
+                        return Double.parseDouble(x) < Integer.MAX_VALUE;
+                    } catch (NumberFormatException e) {
+                        return false;
+                    }
+                })
+                .mapToInt(x -> (int)Double.parseDouble(x)).toArray();
     }
     
 
