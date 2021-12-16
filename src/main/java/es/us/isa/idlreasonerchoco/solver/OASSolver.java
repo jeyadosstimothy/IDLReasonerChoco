@@ -237,4 +237,8 @@ public class OASSolver extends Solver {
         }
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
 }

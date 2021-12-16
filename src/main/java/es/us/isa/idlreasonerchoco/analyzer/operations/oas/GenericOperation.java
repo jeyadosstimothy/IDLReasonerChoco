@@ -5,13 +5,11 @@ import es.us.isa.idlreasonerchoco.configuration.IDLException;
 
 public interface GenericOperation {
     default boolean restartSolverIfNeeded(OASMapper mapper) throws IDLException {
-        if (mapper.isLastOperationInvalidReq() && (!(this instanceof OASRandomRequest) || ((OASRandomRequest)this).isValid())) {
+        if (!mapper.getSolver().isValid() && (!(this instanceof OASRandomRequest) || ((OASRandomRequest)this).isValid()))
             mapper.restartSolver(true);
-            mapper.setLastOperationInvalidReq(false);
-        } else if (!mapper.isLastOperationInvalidReq() && (this instanceof OASRandomRequest && !((OASRandomRequest)this).isValid())) {
+        else if (mapper.getSolver().isValid() && (this instanceof OASRandomRequest && !((OASRandomRequest)this).isValid()))
             mapper.restartSolver(false);
-            mapper.setLastOperationInvalidReq(true);
-        } else
+        else
             return false;
         return true;
     }

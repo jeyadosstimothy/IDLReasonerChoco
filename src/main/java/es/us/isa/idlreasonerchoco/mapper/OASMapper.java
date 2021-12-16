@@ -46,7 +46,6 @@ public class OASMapper extends Mapper {
     private List<Parameter> parameters;
     private OASSolver solver;
     private Map<String, List<String>> data;
-    private boolean lastOperationInvalidReq = false;
     
     public OASMapper(IDLConfiguration configuration, Map<String, List<String>> data) throws IDLException {
         super(configuration);
@@ -209,13 +208,5 @@ public class OASMapper extends Mapper {
 
 	public boolean hasDeps() {
         return !NEW_LINE.equals(idlFromOas);
-    }
-
-    public boolean isLastOperationInvalidReq() {
-        return lastOperationInvalidReq;
-    }
-
-    public void setLastOperationInvalidReq(boolean lastOperationInvalidReq) {
-        this.lastOperationInvalidReq = lastOperationInvalidReq;
     }
 }
