@@ -44,4 +44,6 @@ public abstract class Analyzer {
     
     public abstract void updateData(Map<String, List<String>> data) throws IDLException;
 
+    public abstract Map<String, Map<String, List<String>>> getRequestExplanation(Map<String, String> request) throws IDLException;
+
 }
