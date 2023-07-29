@@ -81,14 +81,10 @@ public class OASAnalyzer extends Analyzer {
     }
 
     @Override
-    public Map<String, Map<String, List<String>>> getRequestExplanation(Map<String, String> request) throws IDLException {
-        Explanation exp = new OASRequestExplanation(mapper, request, false);
-        return exp.getExplanation();
-    }
+    public Map<String, Map<String, List<String>>> getExplanation(Map<String, String> request) throws IDLException {
 
-    @Override
-    public Map<String, Map<String, List<String>>> getOASOperationExplanation() throws IDLException {
-        Explanation exp = new OASOperationExplanation(mapper);
+        Explanation exp = new OASExplanation(mapper, request, false);
+
         return exp.getExplanation();
     }
 
