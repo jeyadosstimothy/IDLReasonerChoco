@@ -86,4 +86,10 @@ public class OASAnalyzer extends Analyzer {
         return exp.getExplanation();
     }
 
+    @Override
+    public Map<String, Map<String, List<String>>> getOASOperationExplanation() throws IDLException {
+        Explanation exp = new OASOperationExplanation(mapper);
+        return exp.getExplanation();
+    }
+
 }

@@ -46,4 +46,6 @@ public abstract class Analyzer {
 
     public abstract Map<String, Map<String, List<String>>> getRequestExplanation(Map<String, String> request) throws IDLException;
 
+    public abstract Map<String, Map<String, List<String>>> getOASOperationExplanation() throws IDLException;
+
 }
