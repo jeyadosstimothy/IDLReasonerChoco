@@ -25,11 +25,14 @@ public class OASExplanation implements Explanation {
     private final boolean partial;
     private List<Constraint> requestConstraints;
 
+    private Map<String, Map<String, List<String>>> explanation;
+
     public OASExplanation(OASMapper mapper, Map<String, String> request, boolean partial) {
         this.mapper = mapper;
         this.request = request;
         this.partial = partial;
         this.requestConstraints = new ArrayList<>();
+        this.explanation = new HashMap<>();
     }
 
     public Map<String, Map<String, List<String>>> getExplanation() throws IDLException {
@@ -45,18 +48,15 @@ public class OASExplanation implements Explanation {
 
         } catch (IDLException e) {
             ExceptionManager.log(LOG, ErrorType.ERROR_VALIDATING_REQUEST.toString(), e);
-            Map<String, Map<String, List<String>>> explanation = new HashMap<>();
             Map<String, List<String>> err = new HashMap<>();
             err.put("ErrorMessage", Collections.singletonList(e.getMessage()));
-            explanation.put("Error", err);
+            this.explanation.put("Error", err);
 
-            return explanation;
+            return this.explanation;
         }
     }
 
     private Map<String, Map<String, List<String>>> getRequestExplanation() throws IDLException {
-
-        Map<String, Map<String, List<String>>> explanation = new HashMap<>();
 
         // Add request constraints to the Choco model
         addRequestParamsConstraints();
@@ -67,26 +67,21 @@ public class OASExplanation implements Explanation {
         //Find minimum conflicts
         List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
 
-        Map<String, List<String>> invalidRequestParams = getInvalidRequestParams(minConflicts);
-        explanation.put("InvalidRequestParams", invalidRequestParams);
+        this.explanation.put("InvalidRequestParams", getInvalidRequestParams(minConflicts));
+        this.explanation.put("IDLConflicts", getIDLConflictsExplanation());
 
-        Map<String, List<String>> idlConflicts = getIDLConflictsExplanation();
-        explanation.put("IDLConflicts", idlConflicts);
-
-        return explanation;
+        return this.explanation;
     }
 
     private Map<String, Map<String, List<String>>> getOperationExplanation() throws IDLException {
-
-        Map<String, Map<String, List<String>>> explanation = new HashMap<>();
 
         // If the operation is valid return null for explanation
         OASValidIDL oasValidIDL = new OASValidIDL(mapper);
         boolean result = oasValidIDL.analyze();
 
         if (result) {
-            explanation.put("Explanation", null);
-            return explanation;
+           this.explanation.put("Explanation", null);
+            return this.explanation;
         }
 
         restartSolverIfNeeded(mapper);
@@ -94,20 +89,16 @@ public class OASExplanation implements Explanation {
         // If the operation has inconsistent IDL, return the explanation
         if (!mapper.getChocoModel().getSolver().solve()) {
 
-            Map<String, List<String>> idlConflicts = getIDLConflictsExplanation();
-
-            explanation.put("IDLConflicts", idlConflicts);
+            this.explanation.put("IDLConflicts", getIDLConflictsExplanation());
 
         } else {
             // If the operation has dead or false optional parameters, return the explanation
 
             // If the operation has dead parameters, return the explanation
-            Map<String, List<String>> deadParameters = getDeadParameters();
-            explanation.put("DeadParameters", deadParameters);
+            this.explanation.put("DeadParameters", getDeadParameters());
 
             // If the operation has false optional parameters, return the explanation
-            Map<String, List<String>> falseOptionalParameters = getFalseOptionalParameters();
-            explanation.put("FalseOptionalParameters", falseOptionalParameters);
+            this.explanation.put("FalseOptionalParameters", getFalseOptionalParameters());
         }
 
         return explanation;
