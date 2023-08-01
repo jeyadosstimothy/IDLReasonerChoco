@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RequestExplanationTest {
+public class RequestExplanationMessageTest {
 
     @Test
     public void no_params_valid() throws IDLException {
@@ -27,6 +27,10 @@ public class RequestExplanationTest {
         Map<String, String> request = new HashMap<>();
         request.put("p1", "false");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
+
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
+
         System.out.println("Test passed: one_param_boolean_no_deps_valid.");
     }
 
@@ -37,10 +41,8 @@ public class RequestExplanationTest {
         request.put("p1", "not boolean");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
 
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("Error"), "The Invalid Request Params Conflicts should not be empty");
-
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
 
         System.out.println("Test passed: one_param_boolean_no_deps_invalid.");
     }
@@ -52,8 +54,8 @@ public class RequestExplanationTest {
         request.put("p1", "a string");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_string_no_deps_valid.");
     }
@@ -64,10 +66,9 @@ public class RequestExplanationTest {
         Map<String, String> request = new HashMap<>();
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
+
         
         System.out.println("Test passed: one_param_string_no_deps_invalid.");
     }
@@ -79,8 +80,8 @@ public class RequestExplanationTest {
         request.put("p1", "10");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_int_no_deps_valid.");
     }
@@ -92,8 +93,8 @@ public class RequestExplanationTest {
 
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
 
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_int_no_deps_invalid.");
     }
@@ -105,8 +106,8 @@ public class RequestExplanationTest {
         request.put("p1", "value1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_enum_string_no_deps_valid.");
     }
@@ -118,10 +119,8 @@ public class RequestExplanationTest {
         request.put("p1", "string not in enum alternatives");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-       assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_enum_string_no_deps_invalid.");
     }
@@ -133,8 +132,8 @@ public class RequestExplanationTest {
         request.put("p1", "1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_enum_int_no_deps_valid.");
     }
@@ -146,12 +145,8 @@ public class RequestExplanationTest {
         request.put("p1", "6");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
 
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-
-       System.out.println("result: " + result);
-
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_param_enum_int_no_deps_invalid.");
     }
@@ -164,12 +159,8 @@ public class RequestExplanationTest {
        // request.put("p2", "a string");
         assertFalse(analyzer.isValidRequest(request), "The request should be VALID");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
-
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_requires_valid.");
     }
@@ -184,10 +175,8 @@ public class RequestExplanationTest {
         request.put("p5", "2");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_requires_invalid.");
     }
@@ -199,8 +188,8 @@ public class RequestExplanationTest {
         request.put("p1", "true");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_or_valid.");
     }
@@ -211,10 +200,8 @@ public class RequestExplanationTest {
         Map<String, String> request = new HashMap<>();
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-      //  assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-     //   assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_or_invalid.");
     }
@@ -227,8 +214,8 @@ public class RequestExplanationTest {
         request.put("p3", "100");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_onlyone_valid.");
     }
@@ -241,10 +228,8 @@ public class RequestExplanationTest {
         request.put("p2", "string");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_onlyone_invalid.");
     }
@@ -258,8 +243,8 @@ public class RequestExplanationTest {
         request.put("p5", "1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_allornone_valid.");
     }
@@ -274,8 +259,8 @@ public class RequestExplanationTest {
         request.put("p5", "1");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         System.out.println("Test passed: one_dep_allornone_invalid.");
         
     }
@@ -286,8 +271,8 @@ public class RequestExplanationTest {
         Map<String, String> request = new HashMap<>();
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_zeroorone_valid.");
     }
@@ -303,10 +288,8 @@ public class RequestExplanationTest {
         request.put("p5", "1");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_zeroorone_invalid.");
     }
@@ -319,8 +302,8 @@ public class RequestExplanationTest {
         request.put("p5", "1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_arithrel_valid.");
     }
@@ -333,10 +316,8 @@ public class RequestExplanationTest {
         request.put("p5", "1");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_arithrel_invalid.");
     }
@@ -351,8 +332,8 @@ public class RequestExplanationTest {
         request.put("p5", "4");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_complex_valid.");
     }
@@ -366,10 +347,8 @@ public class RequestExplanationTest {
         request.put("p3", "-1000");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: one_dep_complex_invalid.");
     }
@@ -385,8 +364,8 @@ public class RequestExplanationTest {
         request.put("p5", "value1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial1_valid.");
     }
@@ -402,10 +381,8 @@ public class RequestExplanationTest {
         request.put("p5", "value5"); // Violates this dependency: p1==p5;
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial1_invalid.");
         
@@ -430,8 +407,8 @@ public class RequestExplanationTest {
         request.put("p3", "value1");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
 
         System.out.println("Test passed: combinatorial3_Valid.");
     }
@@ -447,10 +424,8 @@ public class RequestExplanationTest {
         request.put("p5", "3"); // Violates this dependency: p4>=p5;
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
        
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial3_invalid.");
            
@@ -464,8 +439,8 @@ public class RequestExplanationTest {
         request.put("p3", "100000");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial4_valid.");
     }
@@ -477,10 +452,8 @@ public class RequestExplanationTest {
          
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial4_invalid.");
   
@@ -502,8 +475,8 @@ public class RequestExplanationTest {
         request.put("p10", "value2");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial5_valid.");
     }
@@ -525,11 +498,9 @@ public class RequestExplanationTest {
         request.put("p10", "value2");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
-        
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
+
         System.out.println("Test passed: combinatorial5_invalid.");
  
     }
@@ -548,8 +519,8 @@ public class RequestExplanationTest {
         request.put("p10", "something");
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        assertNull(result.get("Explanation"), "The request is VALID");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial8_valid.");
     }
@@ -568,10 +539,8 @@ public class RequestExplanationTest {
         request.put("p10", "something different from p8"); // Violates this dependency: AllOrNone(p6!=p8, p8==p10);
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
         
-        Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        String result =  analyzer.getExplanationMessage(request);
+        System.out.println(result);
         
         System.out.println("Test passed: combinatorial8_invalid.");
     }

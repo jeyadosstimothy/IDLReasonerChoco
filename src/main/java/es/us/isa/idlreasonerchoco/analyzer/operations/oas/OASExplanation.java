@@ -38,12 +38,7 @@ public class OASExplanation implements Explanation {
 
     public Map<String, Map<String, List<String>>> getExplanation() throws IDLException {
 
-
-
-
         try {
-
-
 
             if (this.request != null)
                 return getRequestExplanation();
@@ -81,6 +76,7 @@ public class OASExplanation implements Explanation {
         this.explanation.put("InvalidRequestParams", getInvalidRequestExplanation());
         this.explanation.put("IDLConflicts", getIDLConflictsExplanation());
 
+        unpostRequestConstraints();
 
         return this.explanation;
     }
@@ -118,7 +114,12 @@ public class OASExplanation implements Explanation {
         Map<String, List<String>> conflictsIDLExplanation = new HashMap<>();
 
         //get All constraints
-        List<Constraint> cstrs = getChocoModelConstraints();
+        List<Constraint> allCstrs = getChocoModelConstraints();
+
+        //remove request constraints from all constraints
+        List<Constraint> cstrs = new ArrayList<>(allCstrs);
+        if(request != null)
+        cstrs.removeAll(requestConstraints);
 
         //Find minimum conflicts
         List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
@@ -253,7 +254,7 @@ public class OASExplanation implements Explanation {
     private Map<String, List<String>> getInvalidRequestExplanation() throws IDLException {
 
         Map<String, List<String>> invalidRequestParams = new HashMap<>();
-            System.out.println("requestConstraints = " + requestConstraints.size());
+
             if (request != null && request.keySet().stream()
                     .allMatch(param -> mapper.getVariablesMap().containsKey(Utils.parseIDLParamName(param)))) {
 
@@ -288,16 +289,8 @@ public class OASExplanation implements Explanation {
                     List<Constraint> cstrs = getChocoModelConstraints();
                     List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
                     invalidRequestParams = getInvalidRequestParams(minConflicts);
+
                 }
-
-                for (Constraint cons : requestConstraints) {
-                    mapper.getChocoModel().unpost(cons);
-                }
-
-                mapper.getChocoModel().getSolver().reset();
-
-
-
                 return invalidRequestParams;
             } else {
                 throw new IDLException(ErrorType.ERROR_UNKNOWN_PARAM_IN_REQUEST.toString());
@@ -344,6 +337,14 @@ public class OASExplanation implements Explanation {
         return arithmConstraints;
     }
 
+    private void unpostRequestConstraints() {
+        for (Constraint cons : requestConstraints) {
+            mapper.getChocoModel().unpost(cons);
+        }
+
+        mapper.getChocoModel().getSolver().reset();
+    }
+
     private Integer mapValueToConstraint(String paramValue, String type) throws IDLException {
         try {
             switch (ParameterType.valueOf(type.toUpperCase())) {
@@ -379,13 +380,16 @@ public class OASExplanation implements Explanation {
         String description = "";
 
 
-        if (explanation.get("Explanation") != null){
-            title = "Valid";
-            description = "There is no error in the request/OAS operation";
-            explanationMessage.append(buildErrorMessage(title, description));
-            return explanationMessage.toString();
+        if (explanation.containsKey("Explanation")){
+            if (explanation.get("Explanation") == null){
+                title = "Valid Request/Operation";
+                description = "There is no error in the request/OAS operation";
+                explanationMessage.append(buildErrorMessage(title, description));
+                return explanationMessage.toString();
+            }
         }
 
+        if (explanation.containsKey("InvalidRequestParams")){
         Map<String, List<String>>  invalidRequestParams = explanation.get("InvalidRequestParams");
 
         if (invalidRequestParams != null && (!invalidRequestParams.isEmpty())){
@@ -393,29 +397,61 @@ public class OASExplanation implements Explanation {
             description = invalidRequestParams.toString();
             explanationMessage.append(buildErrorMessage(title, description));
         }
-
-        Map<String, List<String>>  deadParameters = explanation.get("DeadParameters");
-
-        if (deadParameters != null && (!deadParameters.isEmpty())){
-            title = "Dead Parameters";
-            description = deadParameters.toString();
-            explanationMessage.append(buildErrorMessage(title, description));
         }
 
-        Map<String, List<String>>  falseOptionalParameters = explanation.get("FalseOptionalParameters");
+        if (explanation.containsKey("DeadParameters")) {
+            Map<String, List<String>> deadParameters = explanation.get("DeadParameters");
 
-        if (falseOptionalParameters != null && (!falseOptionalParameters.isEmpty())){
-            title = "False Optional Parameters";
-            description = falseOptionalParameters.toString();
-            explanationMessage.append(buildErrorMessage(title, description));
+            StringBuilder deadParamsDescription = new StringBuilder();
+
+            if (deadParameters != null && (!deadParameters.isEmpty())) {
+                title = "Dead Parameters";
+
+                for (String key : deadParameters.keySet()) {
+                    deadParamsDescription.append("- " + key + " is dead, check constraints " + deadParameters.get(key).toString() + ".\n");
+                }
+                description = deadParamsDescription.toString();
+                explanationMessage.append(buildErrorMessage(title, description));
+            }
         }
 
-        Map<String, List<String>>  idlConflicts = explanation.get("IDLConflicts");
+        if (explanation.containsKey("FalseOptionalParameters")) {
+            Map<String, List<String>> falseOptionalParameters = explanation.get("FalseOptionalParameters");
+            StringBuilder falseOptionalParamsDescription = new StringBuilder();
+            if (falseOptionalParameters != null && (!falseOptionalParameters.isEmpty())) {
+                title = "False Optional Parameters";
 
-        if (idlConflicts != null && (!idlConflicts.get("IDLConflicts").isEmpty())){
-            title = "Inconsistent IDL";
-            description = idlConflicts.toString();
-            explanationMessage.append(buildErrorMessage(title, description));
+                for (String key : falseOptionalParameters.keySet()) {
+                    falseOptionalParamsDescription.append("- " + key + " is false optional, check constraints " + falseOptionalParameters.get(key).toString() + ".\n");
+                }
+                description = falseOptionalParamsDescription.toString();
+                explanationMessage.append(buildErrorMessage(title, description));
+            }
+        }
+
+        if (explanation.containsKey("IDLConflicts")) {
+            Map<String, List<String>> idlConflicts = explanation.get("IDLConflicts");
+            StringBuilder idlConflictsDescription = new StringBuilder();
+
+            if (idlConflicts != null && (!idlConflicts.get("IDLConflicts").isEmpty())) {
+                title = "Inconsistent IDL";
+
+                for (String key : idlConflicts.keySet()) {
+                    idlConflictsDescription.append("- Check constraints " + idlConflicts.get(key).toString() + ".\n");
+                }
+                description = idlConflictsDescription.toString();
+                explanationMessage.append(buildErrorMessage(title, description));
+            }
+        }
+
+        if (explanation.containsKey("Error")) {
+            Map<String, List<String>> error = explanation.get("Error");
+
+            if (error != null && (!error.get("ErrorMessage").isEmpty())) {
+                title = "Error";
+                description = error.get("ErrorMessage").toString();
+                explanationMessage.append(buildErrorMessage(title, description));
+            }
         }
 
         return explanationMessage.toString();
@@ -424,13 +460,11 @@ public class OASExplanation implements Explanation {
     private String buildErrorMessage(String title, String description) {
         StringBuilder errorMessage = new StringBuilder();
 
-        errorMessage.append("Error: ").append(title).append("\n");
-        errorMessage.append("----------------------------------------\n\n");
-        errorMessage.append("Error Details:\n");
-        errorMessage.append("---------------\n");
+        errorMessage.append("Title: ").append(title).append("\n");
+        errorMessage.append("Details:\n");
         errorMessage.append(description);
         errorMessage.append("\n");
-        errorMessage.append("----------------------------------------\n\n");
+        errorMessage.append("----------------------------------------------\n");
         return errorMessage.toString();
     }
 }
