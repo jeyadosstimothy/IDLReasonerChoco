@@ -28,6 +28,7 @@ public class OASExplanation implements Explanation {
     private Map<String, Map<String, List<String>>> explanation;
 
     public OASExplanation(OASMapper mapper, Map<String, String> request, boolean partial) {
+
         this.mapper = mapper;
         this.request = request;
         this.partial = partial;
@@ -37,9 +38,12 @@ public class OASExplanation implements Explanation {
 
     public Map<String, Map<String, List<String>>> getExplanation() throws IDLException {
 
+
+
+
         try {
 
-            restartSolverIfNeeded(mapper);
+
 
             if (this.request != null)
                 return getRequestExplanation();
@@ -56,19 +60,27 @@ public class OASExplanation implements Explanation {
         }
     }
 
+    public String getExplanationMessage() throws IDLException {
+
+        Map<String, Map<String, List<String>>> explanation = this.getExplanation();
+
+        return getMessage(explanation);
+    }
+
     private Map<String, Map<String, List<String>>> getRequestExplanation() throws IDLException {
 
-        // Add request constraints to the Choco model
-        addRequestParamsConstraints();
+        // If the request is valid return null for explanation
+        OASValidRequest oasValidRequest = new OASValidRequest(mapper, request, partial);
+        boolean result = oasValidRequest.analyze();
 
-        //get All constraints
-        List<Constraint> cstrs = getChocoModelConstraints();
+        if (result) {
+            this.explanation.put("Explanation", null);
+            return this.explanation;
+        }
 
-        //Find minimum conflicts
-        List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
-
-        this.explanation.put("InvalidRequestParams", getInvalidRequestParams(minConflicts));
+        this.explanation.put("InvalidRequestParams", getInvalidRequestExplanation());
         this.explanation.put("IDLConflicts", getIDLConflictsExplanation());
+
 
         return this.explanation;
     }
@@ -84,15 +96,12 @@ public class OASExplanation implements Explanation {
             return this.explanation;
         }
 
-        restartSolverIfNeeded(mapper);
-
         // If the operation has inconsistent IDL, return the explanation
         if (!mapper.getChocoModel().getSolver().solve()) {
 
             this.explanation.put("IDLConflicts", getIDLConflictsExplanation());
 
         } else {
-            // If the operation has dead or false optional parameters, return the explanation
 
             // If the operation has dead parameters, return the explanation
             this.explanation.put("DeadParameters", getDeadParameters());
@@ -101,7 +110,7 @@ public class OASExplanation implements Explanation {
             this.explanation.put("FalseOptionalParameters", getFalseOptionalParameters());
         }
 
-        return explanation;
+        return this.explanation;
     }
 
     private Map<String, List<String>> getIDLConflictsExplanation() {
@@ -109,13 +118,7 @@ public class OASExplanation implements Explanation {
         Map<String, List<String>> conflictsIDLExplanation = new HashMap<>();
 
         //get All constraints
-        List<Constraint> allCstrs = getChocoModelConstraints();
-
-        //remove request constraints from all constraints
-        List<Constraint> cstrs = new ArrayList<>(allCstrs);
-
-        if (this.request != null)
-            cstrs.removeAll(requestConstraints);
+        List<Constraint> cstrs = getChocoModelConstraints();
 
         //Find minimum conflicts
         List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
@@ -126,8 +129,7 @@ public class OASExplanation implements Explanation {
         // Find IDL Conflicts
         List<String> idlConflicts = getIDLConflicts(minConflicts, idlArithmConstraints);
 
-        if (!idlConflicts.isEmpty())
-            conflictsIDLExplanation.put("IDLConflicts", idlConflicts);
+        conflictsIDLExplanation.put("IDLConflicts", idlConflicts);
 
         return conflictsIDLExplanation;
     }
@@ -165,6 +167,7 @@ public class OASExplanation implements Explanation {
                     }
                 }
             }
+
             return falseOptionalParameters;
         }
 
@@ -247,9 +250,10 @@ public class OASExplanation implements Explanation {
         }
     }
 
-    private void addRequestParamsConstraints() throws IDLException {
+    private Map<String, List<String>> getInvalidRequestExplanation() throws IDLException {
 
-        try {
+        Map<String, List<String>> invalidRequestParams = new HashMap<>();
+            System.out.println("requestConstraints = " + requestConstraints.size());
             if (request != null && request.keySet().stream()
                     .allMatch(param -> mapper.getVariablesMap().containsKey(Utils.parseIDLParamName(param)))) {
 
@@ -276,16 +280,30 @@ public class OASExplanation implements Explanation {
                     }
                 }
 
+                mapper.getChocoModel().getSolver().reset();
+                boolean result = !mapper.getChocoModel().getSolver().solve();
 
+                if (result) {
+
+                    List<Constraint> cstrs = getChocoModelConstraints();
+                    List<Constraint> minConflicts = getMinimumConflictingConstraints(cstrs);
+                    invalidRequestParams = getInvalidRequestParams(minConflicts);
+                }
+
+                for (Constraint cons : requestConstraints) {
+                    mapper.getChocoModel().unpost(cons);
+                }
+
+                mapper.getChocoModel().getSolver().reset();
+
+
+
+                return invalidRequestParams;
             } else {
                 throw new IDLException(ErrorType.ERROR_UNKNOWN_PARAM_IN_REQUEST.toString());
             }
-        } catch (Exception e) {
-            throw new IDLException(ErrorType.ERROR_UNKNOWN_PARAM_IN_REQUEST.toString());
-        }
+
     }
-
-
 
     private List<Constraint> getChocoModelConstraints() {
         return Arrays.asList(mapper.getChocoModel().getCstrs());
@@ -312,6 +330,7 @@ public class OASExplanation implements Explanation {
                 idlConflicts.add(idlList.get(index));
             }
         }
+
         return idlConflicts;
     }
 
@@ -349,5 +368,69 @@ public class OASExplanation implements Explanation {
             ExceptionManager.rethrow(LOG, ErrorType.ERROR_MAPPING_TO_CONSTRAINT.toString(), e);
             return null;
         }
+    }
+
+    private String getMessage(Map<String, Map<String, List<String>>> explanation) throws IDLException {
+
+        // create a string with the explanation message
+
+        StringBuilder explanationMessage = new StringBuilder();
+        String title = "";
+        String description = "";
+
+
+        if (explanation.get("Explanation") != null){
+            title = "Valid";
+            description = "There is no error in the request/OAS operation";
+            explanationMessage.append(buildErrorMessage(title, description));
+            return explanationMessage.toString();
+        }
+
+        Map<String, List<String>>  invalidRequestParams = explanation.get("InvalidRequestParams");
+
+        if (invalidRequestParams != null && (!invalidRequestParams.isEmpty())){
+            title = "Invalid Request Parameters";
+            description = invalidRequestParams.toString();
+            explanationMessage.append(buildErrorMessage(title, description));
+        }
+
+        Map<String, List<String>>  deadParameters = explanation.get("DeadParameters");
+
+        if (deadParameters != null && (!deadParameters.isEmpty())){
+            title = "Dead Parameters";
+            description = deadParameters.toString();
+            explanationMessage.append(buildErrorMessage(title, description));
+        }
+
+        Map<String, List<String>>  falseOptionalParameters = explanation.get("FalseOptionalParameters");
+
+        if (falseOptionalParameters != null && (!falseOptionalParameters.isEmpty())){
+            title = "False Optional Parameters";
+            description = falseOptionalParameters.toString();
+            explanationMessage.append(buildErrorMessage(title, description));
+        }
+
+        Map<String, List<String>>  idlConflicts = explanation.get("IDLConflicts");
+
+        if (idlConflicts != null && (!idlConflicts.get("IDLConflicts").isEmpty())){
+            title = "Inconsistent IDL";
+            description = idlConflicts.toString();
+            explanationMessage.append(buildErrorMessage(title, description));
+        }
+
+        return explanationMessage.toString();
+    }
+
+    private String buildErrorMessage(String title, String description) {
+        StringBuilder errorMessage = new StringBuilder();
+
+        errorMessage.append("Error: ").append(title).append("\n");
+        errorMessage.append("----------------------------------------\n\n");
+        errorMessage.append("Error Details:\n");
+        errorMessage.append("---------------\n");
+        errorMessage.append(description);
+        errorMessage.append("\n");
+        errorMessage.append("----------------------------------------\n\n");
+        return errorMessage.toString();
     }
 }

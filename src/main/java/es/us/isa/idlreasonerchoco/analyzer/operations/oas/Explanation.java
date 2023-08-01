@@ -9,4 +9,5 @@ import java.util.Map;
 public interface Explanation extends GenericOperation{
 
 	Map<String, Map<String, List<String>>> getExplanation() throws IDLException;
+	String getExplanationMessage() throws IDLException;
 }

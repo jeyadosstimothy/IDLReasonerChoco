@@ -53,9 +53,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_param_string_no_deps_valid.");
     }
@@ -69,7 +67,7 @@ public class RequestExplanationTest {
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
         System.out.println("result: " + result);
         assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-       // assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
         
         System.out.println("Test passed: one_param_string_no_deps_invalid.");
     }
@@ -82,9 +80,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_param_int_no_deps_valid.");
     }
@@ -93,14 +89,11 @@ public class RequestExplanationTest {
     public void one_param_int_no_deps_invalid() throws IDLException {
         Analyzer analyzer = new OASAnalyzer( "./src/test/resources/OAS_test_suite_orig.yaml", "/oneParamInt", "get");
         Map<String, String> request = new HashMap<>();
-       
-        // request.put("p1", "not an integer");
-       // assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
-        
+
+        assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
+
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-       // assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-       // assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_param_int_no_deps_invalid.");
     }
@@ -113,9 +106,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_param_enum_string_no_deps_valid.");
     }
@@ -130,7 +121,7 @@ public class RequestExplanationTest {
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
         System.out.println("result: " + result);
         assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-       // assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+       assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
         
         System.out.println("Test passed: one_param_enum_string_no_deps_invalid.");
     }
@@ -143,9 +134,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_param_enum_int_no_deps_valid.");
     }
@@ -156,11 +145,19 @@ public class RequestExplanationTest {
         Map<String, String> request = new HashMap<>();
         request.put("p1", "6");
         assertFalse(analyzer.isValidRequest(request), "The request should be NOT valid");
-        
+        System.out.println("########################################################");
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
+        System.out.println("########################################################");
+
+        System.out.println("########################################################");
+        System.out.println( analyzer.getExplanationMessage(request));
+        System.out.println("########################################################");
+
+       // System.out.println("result: " + result);
+       // System.out.println(analyzer.getExplanation(request));
+
         assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-       // assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
         
         System.out.println("Test passed: one_param_enum_int_no_deps_invalid.");
     }
@@ -195,8 +192,8 @@ public class RequestExplanationTest {
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
         System.out.println("result: " + result);
-        //assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
-        //assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
+        assertNotNull(result.get("InvalidRequestParams"), "The Invalid Request Params Conflicts should not be empty");
+        assertNotNull(result.get("IDLConflicts"), "The IDL Conflicts should not be empty");
         
         System.out.println("Test passed: one_dep_requires_invalid.");
     }
@@ -209,9 +206,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_or_valid.");
     }
@@ -239,9 +234,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_onlyone_valid.");
     }
@@ -272,9 +265,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_allornone_valid.");
     }
@@ -302,9 +293,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_zeroorone_valid.");
     }
@@ -337,9 +326,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_arithrel_valid.");
     }
@@ -371,9 +358,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: one_dep_complex_valid.");
     }
@@ -407,9 +392,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
        
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: combinatorial1_valid.");
     }
@@ -454,10 +437,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should  be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
 
         System.out.println("Test passed: combinatorial3_Valid.");
     }
@@ -491,9 +471,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: combinatorial4_valid.");
     }
@@ -531,9 +509,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: combinatorial5_valid.");
     }
@@ -579,9 +555,7 @@ public class RequestExplanationTest {
         assertTrue(analyzer.isValidRequest(request), "The request should be VALID");
         
         Map<String, Map<String, List<String>>> result =  analyzer.getExplanation(request);
-        System.out.println("result: " + result);
-        assertTrue(result.get("InvalidRequestParams").isEmpty(), "The Invalid Request Params Conflicts should not be empty");
-        assertTrue(result.get("IDLConflicts").isEmpty(), "The IDL Conflicts should not be empty");
+        assertNull(result.get("Explanation"), "The request is VALID");
         
         System.out.println("Test passed: combinatorial8_valid.");
     }

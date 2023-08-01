@@ -275,6 +275,7 @@ public class OperationExplanationTest {
     public void combinatorial6() throws IDLException {
         Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/combinatorial6", "get");
         Map<String, Map<String, List<String>>> result = analyzer.getExplanation(null);
+
         assertFalse(analyzer.isValidIDL(), "The IDL should be VALID");
         assertNotNull(result.get("IDLConflicts"), "The IDL should has no conflicts!");
         assertNull(result.get("DeadParameters"), "The IDL should has no DeadParameters!");
@@ -289,9 +290,9 @@ public class OperationExplanationTest {
         Analyzer analyzer = new OASAnalyzer("./src/test/resources/OAS_test_suite_orig.yaml", "/combinatorial7", "get");
         Map<String, Map<String, List<String>>> result = analyzer.getExplanation(null);
 
-        assertFalse(analyzer.isValidIDL(), "The IDL should be VALID");
+        assertFalse(analyzer.isValidIDL(), "The IDL should be not VALID");
         assertNull(result.get("IDLConflicts"), "The IDL should has no conflicts!");
-        //  assertNotNull(result.get("DeadParameters") , "The IDL should has no DeadParameters!");
+        assertNotNull(result.get("DeadParameters") , "The IDL should has no DeadParameters!");
         assertTrue(result.get("FalseOptionalParameters").isEmpty(), "The IDL should has no FalseOptionalParameters!");
 
         System.out.println("result: " + result);

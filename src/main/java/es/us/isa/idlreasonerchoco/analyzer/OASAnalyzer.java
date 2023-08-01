@@ -16,7 +16,7 @@ public class OASAnalyzer extends Analyzer {
     }
 
     public OASAnalyzer(String apiSpecification, String operationPath, String operationType, boolean specAsString) throws IDLException {
-        this(null, apiSpecification, operationPath, operationType, false);
+        this(null, apiSpecification, operationPath, operationType, specAsString);
     }
 
     public OASAnalyzer(String idlPath, String apiSpecification, String operationPath, String operationType) throws IDLException {
@@ -83,9 +83,17 @@ public class OASAnalyzer extends Analyzer {
     @Override
     public Map<String, Map<String, List<String>>> getExplanation(Map<String, String> request) throws IDLException {
 
-        Explanation exp = new OASExplanation(mapper, request, false);
+        Explanation explanation = new OASExplanation(mapper, request, false);
 
-        return exp.getExplanation();
+        return explanation.getExplanation();
+    }
+    @Override
+    public String getExplanationMessage(Map<String, String> request) throws IDLException {
+
+        Explanation explanation = new OASExplanation(mapper, request, false);
+
+        return explanation.getExplanationMessage();
+
     }
 
 }
