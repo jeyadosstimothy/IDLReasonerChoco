@@ -464,7 +464,6 @@ public class OASExplanation implements Explanation {
         errorMessage.append("Details:\n");
         errorMessage.append(description);
         errorMessage.append("\n");
-        errorMessage.append("----------------------------------------------\n");
         return errorMessage.toString();
     }
 }
