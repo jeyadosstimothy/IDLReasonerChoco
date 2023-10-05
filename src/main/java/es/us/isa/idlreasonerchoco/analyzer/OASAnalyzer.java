@@ -3,15 +3,8 @@ package es.us.isa.idlreasonerchoco.analyzer;
 import java.util.List;
 import java.util.Map;
 
+import es.us.isa.idlreasonerchoco.analyzer.operations.oas.*;
 import es.us.isa.idlreasonerchoco.mapper.OASMapper;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.AnalysisOperation;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASConsistent;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASDeadParameter;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASFalseOptional;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASRandomRequest;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASValidIDL;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.OASValidRequest;
-import es.us.isa.idlreasonerchoco.analyzer.operations.oas.RequestGenerationOperation;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 
 public class OASAnalyzer extends Analyzer {
@@ -23,7 +16,7 @@ public class OASAnalyzer extends Analyzer {
     }
 
     public OASAnalyzer(String apiSpecification, String operationPath, String operationType, boolean specAsString) throws IDLException {
-        this(null, apiSpecification, operationPath, operationType, false);
+        this(null, apiSpecification, operationPath, operationType, specAsString);
     }
 
     public OASAnalyzer(String idlPath, String apiSpecification, String operationPath, String operationType) throws IDLException {
@@ -85,6 +78,22 @@ public class OASAnalyzer extends Analyzer {
 
     public void updateData(Map<String, List<String>> data) throws IDLException {
     	this.mapper.updateData(data);
+    }
+
+    @Override
+    public Map<String, Map<String, List<String>>> getExplanation(Map<String, String> request) throws IDLException {
+
+        Explanation explanation = new OASExplanation(mapper, request, false);
+
+        return explanation.getExplanation();
+    }
+    @Override
+    public String getExplanationMessage(Map<String, String> request) throws IDLException {
+
+        Explanation explanation = new OASExplanation(mapper, request, false);
+
+        return explanation.getExplanationMessage();
+
     }
 
 }

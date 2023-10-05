@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>es.us.isa</groupId>
-    <artifactId>idlreasoner-choco</artifactId>
-    <version>1.0.0</version>
+    <artifactId>idlreasoner</artifactId>
+    <version>1.0.1</version>
 
-    <name>IDLReasonerChoco</name>
+    <name>IDLReasoner</name>
     <description>A Choco-based Java library for analyzing IDL specifications</description>
 
     <developers>
