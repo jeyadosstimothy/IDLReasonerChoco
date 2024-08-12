@@ -5,7 +5,8 @@ public enum ParameterType {
   ARRAY("array"),
   INTEGER("integer"),
   STRING("string"),
-  BOOLEAN("boolean");
+  BOOLEAN("boolean"),
+  OBJECT("object");
 
   private String type;
 

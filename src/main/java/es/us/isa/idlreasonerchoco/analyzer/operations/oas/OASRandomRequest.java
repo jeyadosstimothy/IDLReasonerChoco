@@ -1,5 +1,6 @@
 package es.us.isa.idlreasonerchoco.analyzer.operations.oas;
 
+import com.google.common.collect.ImmutableMap;
 import es.us.isa.idlreasonerchoco.configuration.ErrorType;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 import es.us.isa.idlreasonerchoco.mapper.OASMapper;
@@ -9,6 +10,7 @@ import es.us.isa.idlreasonerchoco.utils.Utils;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.chocosolver.solver.search.limits.TimeCounter;
@@ -28,9 +30,20 @@ public class OASRandomRequest implements RequestGenerationOperation {
     this.valid = valid;
   }
 
+  @Override
   public Map<String, String> generate() throws IDLException {
+    Map<Parameter, String> parameterStringMap = generateWithParameter();
+    if (parameterStringMap == null) {
+      return null;
+    }
+    return parameterStringMap.entrySet().stream()
+        .collect(ImmutableMap.toImmutableMap(e -> e.getKey().getName(), Entry::getValue));
+  }
+
+  @Override
+  public Map<Parameter, String> generateWithParameter() throws IDLException {
     boolean restarted = restartSolverIfNeeded(mapper);
-    Map<String, String> request = null;
+    Map<Parameter, String> request = null;
     if (valid
         || mapper.hasDeps()) { // If there are no deps, it's impossible to generate invalid request
       if (!restarted) mapper.getChocoModel().getSolver().reset();
@@ -39,7 +52,7 @@ public class OASRandomRequest implements RequestGenerationOperation {
     return request;
   }
 
-  private Map<String, String> mapRequest() throws IDLException {
+  private Map<Parameter, String> mapRequest() throws IDLException {
     mapper
         .getChocoModel()
         .getSolver()
@@ -51,7 +64,7 @@ public class OASRandomRequest implements RequestGenerationOperation {
           .getSolver()
           .addStopCriterion(new TimeCounter(mapper.getChocoModel(), TIMEOUT));
     }
-    Map<String, String> request = new HashMap<>();
+    Map<Parameter, String> request = new HashMap<>();
     for (Parameter parameter : mapper.getParameters()) {
       BoolVar varSet =
           mapper
@@ -62,8 +75,7 @@ public class OASRandomRequest implements RequestGenerationOperation {
         IntVar paramVar =
             mapper.getVariablesMap().get(Utils.parseIDLParamName(parameter.getName())).asIntVar();
         request.put(
-            parameter.getName(),
-            mapConstraintToValue(paramVar.getValue(), parameter.getSchema().getType()));
+            parameter, mapConstraintToValue(paramVar.getValue(), parameter.getSchema().getType()));
       }
     }
     return request;

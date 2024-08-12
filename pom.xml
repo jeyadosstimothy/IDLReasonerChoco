@@ -4,7 +4,7 @@
 
   <groupId>es.us.isa</groupId>
   <artifactId>idlreasoner</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <name>IDLReasoner</name>
   <description>A Choco-based Java library for analyzing IDL specifications</description>
