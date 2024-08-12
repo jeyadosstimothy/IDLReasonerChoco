@@ -4,5 +4,5 @@ import es.us.isa.idlreasonerchoco.configuration.IDLException;
 
 public interface AnalysisOperation extends GenericOperation {
 
-    boolean analyze() throws IDLException;
+  boolean analyze() throws IDLException;
 }
