@@ -2,6 +2,7 @@ package es.us.isa.idlreasonerchoco.analyzer;
 
 import es.us.isa.idlreasonerchoco.configuration.IDLConfiguration;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,10 @@ public abstract class Analyzer {
   public abstract Map<String, String> getRandomValidRequest() throws IDLException;
 
   public abstract Map<String, String> getRandomInvalidRequest() throws IDLException;
+
+  public abstract Map<Parameter, String> getRandomValidRequestWithParameter() throws IDLException;
+
+  public abstract Map<Parameter, String> getRandomInvalidRequestWithParameter() throws IDLException;
 
   public abstract boolean isValidRequest(Map<String, String> request) throws IDLException;
 

@@ -19,6 +19,13 @@ public class AdditionalTests {
   }
 
   @Test
+  public void jsonParametersTest() throws IDLException {
+    Analyzer analyzer = new OASAnalyzer("./src/test/resources/xflow.yaml", "/v1/accounts", "post");
+    assertTrue(analyzer.isValidIDL(), "The IDL should be VALID");
+    System.out.println("Test passed: jsonParametersTest.");
+  }
+
+  @Test
   public void formDataParametersTest() throws IDLException {
     Analyzer analyzer = new OASAnalyzer("./src/test/resources/stripe.yaml", "/v1/products", "post");
     assertTrue(analyzer.isValidIDL(), "The IDL should be VALID");

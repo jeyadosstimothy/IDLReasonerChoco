@@ -10,6 +10,15 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class RandomInvalidRequestTest {
+  @Test
+  public void xflow() throws IDLException {
+    Analyzer analyzer = new OASAnalyzer("./src/test/resources/xflow.yaml", "/v1/accounts", "post");
+    Map<String, String> invalidRequest = analyzer.getRandomInvalidRequest();
+    System.out.println(invalidRequest);
+    assertFalse(analyzer.isValidRequest(invalidRequest), "The request should be NOT valid");
+    System.out.println(analyzer.getExplanationMessage(invalidRequest));
+    System.out.println("Test passed: xflow.");
+  }
 
   @Test
   public void no_params() throws IDLException {

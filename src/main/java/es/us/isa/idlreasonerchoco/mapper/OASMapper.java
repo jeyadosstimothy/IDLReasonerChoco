@@ -5,6 +5,7 @@ import es.us.isa.idlreasonerchoco.configuration.ErrorType;
 import es.us.isa.idlreasonerchoco.configuration.IDLConfiguration;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 import es.us.isa.idlreasonerchoco.model.OperationType;
+import es.us.isa.idlreasonerchoco.model.ParameterType;
 import es.us.isa.idlreasonerchoco.solver.OASSolver;
 import es.us.isa.idlreasonerchoco.utils.ExceptionManager;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -32,10 +33,13 @@ public class OASMapper extends Mapper {
   private static final Logger LOG = LogManager.getLogger(OASMapper.class);
 
   private static final String FORM_DATA = "formData";
+  private static final String BODY = "body";
   private static final String OAS_SPECIFICATION_TYPE = "oas";
   private static final String X_DEPENDENCIES = "x-dependencies";
   private static final String NEW_LINE = "\n";
-  private static final String APPLICATION_TYPE = "application/x-www-form-urlencoded";
+  private static final String APPLICATION_TYPE_FORM_URL_ENCODED =
+      "application/x-www-form-urlencoded";
+  private static final String APPLICATION_TYPE_JSON = "application/json";
 
   private String idlFromOas = null;
   private OpenAPI openApiSpecification;
@@ -80,8 +84,18 @@ public class OASMapper extends Mapper {
             this.configuration.getOperationPath(), this.configuration.getOperationType());
     this.parameters =
         this.operation.getParameters() != null ? this.operation.getParameters() : new ArrayList<>();
-    if (this.operation.getRequestBody() != null) {
+
+    if (this.operation.getRequestBody() == null) {
+      return;
+    }
+    if (this.operation
+        .getRequestBody()
+        .getContent()
+        .containsKey(APPLICATION_TYPE_FORM_URL_ENCODED)) {
       this.parameters.addAll(getFormDataParameters(this.operation));
+    }
+    if (this.operation.getRequestBody().getContent().containsKey(APPLICATION_TYPE_JSON)) {
+      this.parameters.addAll(getJsonParameters(this.operation));
     }
   }
 
@@ -115,7 +129,12 @@ public class OASMapper extends Mapper {
     Map<String, Schema> formDataBodyProperties;
 
     try {
-      formDataBody = operation.getRequestBody().getContent().get(APPLICATION_TYPE).getSchema();
+      formDataBody =
+          operation
+              .getRequestBody()
+              .getContent()
+              .get(APPLICATION_TYPE_FORM_URL_ENCODED)
+              .getSchema();
       formDataBodyProperties = formDataBody.getProperties();
     } catch (NullPointerException e) {
       return formDataParameters;
@@ -142,6 +161,71 @@ public class OASMapper extends Mapper {
     }
 
     return formDataParameters;
+  }
+
+  private Collection<Parameter> getJsonParametersForObjectProperty(
+      String propertyName, Schema<?> propertySchema) {
+    List<Parameter> parameters = new ArrayList<>();
+    for (Map.Entry<String, Schema> property : propertySchema.getProperties().entrySet()) {
+      String childPropertyName = propertyName + "." + property.getKey();
+      if (property.getValue().getType().equals(ParameterType.OBJECT.toString())) {
+        parameters.addAll(
+            getJsonParametersForObjectProperty(childPropertyName, property.getValue()));
+        continue;
+      }
+      Parameter parameter =
+          new Parameter()
+              .name(childPropertyName)
+              .in(BODY)
+              .required(
+                  propertySchema.getRequired() != null
+                      && propertySchema.getRequired().contains(property.getKey()));
+      parameter.setSchema(new Schema().type(property.getValue().getType()));
+      parameter.getSchema().setEnum(property.getValue().getEnum());
+      parameters.add(parameter);
+    }
+    return parameters;
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Collection<Parameter> getJsonParameters(Operation operation) {
+    List<Parameter> jsonParameters = new ArrayList<>();
+    Schema jsonBody;
+    Map<String, Schema> jsonBodyProperties;
+
+    try {
+      jsonBody = operation.getRequestBody().getContent().get(APPLICATION_TYPE_JSON).getSchema();
+      jsonBodyProperties = jsonBody.getProperties();
+    } catch (NullPointerException e) {
+      return jsonParameters;
+    }
+
+    if (jsonBodyProperties == null) {
+      String body =
+          this.configuration.getOperationPath().replace("/", "_").substring(1) + BODY_EXTENSION;
+      jsonBody = this.openApiSpecification.getComponents().getSchemas().get(body);
+      jsonBodyProperties = jsonBody.getProperties();
+    }
+
+    for (Map.Entry<String, Schema> property : jsonBodyProperties.entrySet()) {
+      if (property.getValue().getType().equals(ParameterType.OBJECT.toString())) {
+        jsonParameters.addAll(
+            getJsonParametersForObjectProperty(property.getKey(), property.getValue()));
+        continue;
+      }
+      Parameter parameter =
+          new Parameter()
+              .name(property.getKey())
+              .in(BODY)
+              .required(
+                  jsonBody.getRequired() != null
+                      && jsonBody.getRequired().contains(property.getKey()));
+      parameter.setSchema(new Schema().type(property.getValue().getType()));
+      parameter.getSchema().setEnum(property.getValue().getEnum());
+      jsonParameters.add(parameter);
+    }
+
+    return jsonParameters;
   }
 
   private Operation getOasOperation(String operationPath, String operationType)

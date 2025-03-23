@@ -66,7 +66,6 @@ The ResolutorCreator class is the class where the resolver specified in the conf
 				this.curentCompiler = new MinizincResolutor(this.fileRoute, this.solver);
 			}
 
-
 		} else {
 			this.curentCompiler = new Resolutor(fileRoute);
 		}

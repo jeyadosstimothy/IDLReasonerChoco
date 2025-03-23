@@ -3,6 +3,7 @@ package es.us.isa.idlreasonerchoco.analyzer;
 import es.us.isa.idlreasonerchoco.analyzer.operations.oas.*;
 import es.us.isa.idlreasonerchoco.configuration.IDLException;
 import es.us.isa.idlreasonerchoco.mapper.OASMapper;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +73,18 @@ public class OASAnalyzer extends Analyzer {
   public Map<String, String> getRandomInvalidRequest() throws IDLException {
     RequestGenerationOperation randomInvalidRequest = new OASRandomRequest(mapper, false);
     return randomInvalidRequest.generate();
+  }
+
+  @Override
+  public Map<Parameter, String> getRandomValidRequestWithParameter() throws IDLException {
+    RequestGenerationOperation randomValidRequest = new OASRandomRequest(mapper, true);
+    return randomValidRequest.generateWithParameter();
+  }
+
+  @Override
+  public Map<Parameter, String> getRandomInvalidRequestWithParameter() throws IDLException {
+    RequestGenerationOperation randomInvalidRequest = new OASRandomRequest(mapper, false);
+    return randomInvalidRequest.generateWithParameter();
   }
 
   @Override
